@@ -3,6 +3,7 @@ package net.leaderos.plugin.modules.credit.commands;
 import dev.triumphteam.cmd.bukkit.annotation.Permission;
 import dev.triumphteam.cmd.core.BaseCommand;
 import dev.triumphteam.cmd.core.annotation.Command;
+import dev.triumphteam.cmd.core.annotation.Optional;
 import dev.triumphteam.cmd.core.annotation.SubCommand;
 import lombok.RequiredArgsConstructor;
 import net.leaderos.plugin.Bukkit;
@@ -11,6 +12,7 @@ import net.leaderos.plugin.api.handlers.UpdateCacheEvent;
 import net.leaderos.plugin.helpers.ChatUtil;
 import net.leaderos.shared.helpers.MoneyUtil;
 import net.leaderos.shared.helpers.Placeholder;
+import net.leaderos.shared.helpers.RandomUtil;
 import net.leaderos.shared.helpers.RequestUtil;
 import net.leaderos.shared.modules.credit.enums.UpdateType;
 import org.bukkit.command.CommandSender;
@@ -170,8 +172,8 @@ public class CreditCommand extends BaseCommand {
      * @param sender executor
      * @param amount of to set
      */
-    @SubCommand(value = "remove", alias = "sil")
-    @Permission("leaderos.credit.remove")
+    @SubCommand(value = "bonus")
+    @Permission("leaderos.credit.bonus")
     public void bonusCommand(CommandSender sender, Integer amount) {
         if (amount <= 0) {
             amount = 0;
@@ -181,6 +183,36 @@ public class CreditCommand extends BaseCommand {
         org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getInstance(), () -> {
             boolean success = LeaderOSAPI.getCreditManager().setBonus(finalAmount);
             if (success) ChatUtil.sendMessage(sender, "&aUpdated.");
+            else ChatUtil.sendMessage(sender, "&cError.");
+        });
+    }
+
+    /**
+     * Removes credit from targeted user
+     * @param sender executor
+     * @param amount of to set
+     */
+    @SubCommand(value = "coupon")
+    @Permission("leaderos.credit.coupon")
+    public void createCouponCommand(CommandSender sender, String targetPlayer, Integer amount, @Optional String key) {
+        if (key == null) {
+            key = "VEX-" + RandomUtil.randomString(6);
+        }
+
+        String finalKey = key;
+        org.bukkit.Bukkit.getScheduler().runTaskAsynchronously(Bukkit.getInstance(), () -> {
+            boolean success = LeaderOSAPI.getCreditManager().createCoupon(targetPlayer, finalKey, amount);
+            if (success) {
+                Player player = Bukkit.getInstance().getServer().getPlayerExact(targetPlayer);
+                if (player != null) {
+                    ChatUtil.sendMessage(player, ChatUtil.replacePlaceholders(
+                            Bukkit.getInstance().getLangFile().getMessages().getCredit().getReceivedCoupon(),
+                            new Placeholder("{key}", finalKey),
+                            new Placeholder("{amount}", MoneyUtil.format(amount))
+                    ));
+                }
+                ChatUtil.sendMessage(sender, "&aUpdated.");
+            }
             else ChatUtil.sendMessage(sender, "&cError.");
         });
     }

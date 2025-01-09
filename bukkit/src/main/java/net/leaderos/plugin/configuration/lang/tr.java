@@ -281,6 +281,8 @@ public class tr extends Language {
 
             private String receivedCredit = "{prefix} &b{player} &aadlı oyuncudan &e{amount} kredi &aaldın.";
 
+            private String receivedCoupon = "{prefix} &e{amount} kredi &adeğerindeki kredi kuponu kazandın. Kupon: &e{key}";
+
             private String cacheUpdated = "{prefix} &b{target} &aadlı oyuncunun önbelleğe alınmış verisi güncellendi.";
         }
 

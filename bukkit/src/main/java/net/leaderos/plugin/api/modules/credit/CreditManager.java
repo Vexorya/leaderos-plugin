@@ -56,6 +56,16 @@ public class CreditManager {
     }
 
     /**
+     * Sets bonus credits
+     * @return true if success
+     */
+    public boolean createCoupon(String playerName, String key, int amount) {
+        Response setBonusResponse = CreditHelper.createCoupon(playerName, key, amount);
+
+        return (Objects.requireNonNull(setBonusResponse).getResponseCode() == HttpURLConnection.HTTP_OK);
+    }
+
+    /**
      * Adds player's credit
      * @param target to add credit
      * @param amount to add

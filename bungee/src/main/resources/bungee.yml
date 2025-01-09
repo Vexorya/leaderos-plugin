@@ -1,4 +1,0 @@
-name: LeaderOS
-main: net.leaderos.bungee.Bungee
-version: '${shared.version}'
-author: leaderos

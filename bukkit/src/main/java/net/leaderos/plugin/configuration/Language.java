@@ -281,6 +281,8 @@ public class Language extends OkaeriConfig {
 
             private String receivedCredit = "{prefix} &aYou just received &e{amount} credit(s) &afrom &b{player}&a.";
 
+            private String receivedCoupon = "{prefix} &aYou just received a coupon for &e{amount} credit(s). Coupon: &e{key}";
+
             private String cacheUpdated = "{prefix} &aSuccessfully updated cache for &b{target}&a.";
         }
 
