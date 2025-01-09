@@ -93,4 +93,34 @@ public class CreditHelper {
             return null;
         }
     }
+
+    /**
+     * Sets credit to target player
+     * @param amount bonus amount
+     * @return Response of request
+     */
+    public static @Nullable Response setBonusCredit(int amount) {
+        try {
+            PostRequest post = new SetBonusRequest(amount);
+            return post.getResponse();
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Sets credit to target player
+     * @param amount bonus amount
+     * @return Response of request
+     */
+    public static @Nullable Response createCoupon(String playerName, String key, int amount) {
+        try {
+            PostRequest post = new CreateCouponRequest(playerName, key, amount);
+            return post.getResponse();
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
 }

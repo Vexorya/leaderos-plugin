@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
  * @since 1.0
  */
 @RequiredArgsConstructor
-@Command(value = "discord-sync", alias = {"discord-link"})
+@Command(value = "discord-sync", alias = {"discord-link", "discordesle"})
 public class SyncCommand extends BaseCommand {
 
     /**

@@ -45,6 +45,17 @@ public class CreditManager {
     }
 
     /**
+     * Sets bonus credits
+     * @param amount to set
+     * @return true if success
+     */
+    public boolean setBonus(int amount) {
+        Response setBonusResponse = CreditHelper.setBonusCredit(amount);
+
+        return (Objects.requireNonNull(setBonusResponse).getResponseCode() == HttpURLConnection.HTTP_OK);
+    }
+
+    /**
      * Adds player's credit
      * @param target to add credit
      * @param amount to add
