@@ -1,7 +1,10 @@
 package net.leaderos.plugin;
 
+import com.google.common.collect.Lists;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import dev.triumphteam.cmd.bukkit.message.BukkitMessageKey;
+import dev.triumphteam.cmd.core.Command;
+import dev.triumphteam.cmd.core.exceptions.CommandRegistrationException;
 import dev.triumphteam.cmd.core.message.MessageKey;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
@@ -14,17 +17,23 @@ import net.leaderos.plugin.configuration.Language;
 import net.leaderos.plugin.configuration.Modules;
 import net.leaderos.plugin.helpers.ChatUtil;
 import net.leaderos.plugin.helpers.DebugBukkit;
-import net.leaderos.plugin.modules.credit.CreditModule;
 import net.leaderos.plugin.modules.discord.DiscordModule;
 import net.leaderos.shared.Shared;
 import net.leaderos.shared.helpers.Placeholder;
 import net.leaderos.shared.helpers.PluginUpdater;
 import net.leaderos.shared.helpers.UrlUtil;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Server;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * Main class of project
@@ -94,7 +103,6 @@ public class Bukkit extends JavaPlugin {
 
         // Loads modules
         LeaderOSAPI.getModuleManager().registerModule(new DiscordModule());
-        LeaderOSAPI.getModuleManager().registerModule(new CreditModule());
 
         if (getConfigFile().getSettings().getUrl().equals("https://yourwebsite.com")) {
             getLogger().warning(ChatUtil.getMessage(getLangFile().getMessages().getChangeApiUrl()));
@@ -116,6 +124,7 @@ public class Bukkit extends JavaPlugin {
      */
     public void onDisable() {
         LeaderOSAPI.getModuleManager().disableModules();
+        unregisterCommands();
     }
 
     /**
@@ -184,6 +193,37 @@ public class Bukkit extends JavaPlugin {
                 }
             } catch (Exception ignored) {}
         });
+    }
+
+    public void unregisterCommands() {
+        Lists.newArrayList("leaderos").forEach(this::unregisterCommand);
+    }
+
+    public void unregisterCommand(String name) {
+        getBukkitCommands(getCommandMap()).remove(name);
+    }
+
+    @NotNull
+    private CommandMap getCommandMap() {
+        try {
+            Server server = org.bukkit.Bukkit.getServer();
+            Method getCommandMap = server.getClass().getDeclaredMethod("getCommandMap");
+            getCommandMap.setAccessible(true);
+            return (CommandMap)getCommandMap.invoke(server, new Object[0]);
+        } catch (Exception ignored) {
+            throw new CommandRegistrationException("Unable get Command Map. Commands will not be registered!");
+        }
+    }
+
+    @NotNull
+    private Map<String, Command> getBukkitCommands(@NotNull CommandMap commandMap) {
+        try {
+            Field bukkitCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
+            bukkitCommands.setAccessible(true);
+            return (Map<String, Command>)bukkitCommands.get(commandMap);
+        } catch (NoSuchFieldException|IllegalAccessException e) {
+            throw new CommandRegistrationException("Unable get Bukkit commands. Commands might not be registered correctly!");
+        }
     }
 
     /**
